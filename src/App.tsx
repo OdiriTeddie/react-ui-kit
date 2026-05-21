@@ -1,8 +1,10 @@
+import { DataGridExample } from "./components/data-grid";
+
 function App() {
   return (
-    <>
-      <h1>Hello</h1>
-    </>
+    <main className="p-8">
+      <DataGridExample />
+    </main>
   );
 }
 

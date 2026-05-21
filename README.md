@@ -1,73 +1,154 @@
-# React + TypeScript + Vite
+# React UI Kit
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Enterprise-ready React components for teams building internal tools, admin panels, dashboards, and data-heavy products.
 
-Currently, two official plugins are available:
+The project is starting with a typed `DataGrid` component and will grow into a broader set of reusable UI primitives and composed business components.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Status
 
-## React Compiler
+This package is early-stage. The public API may change while the first components are being shaped.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Goals
 
-## Expanding the ESLint configuration
+- TypeScript-first React components.
+- Practical defaults for enterprise applications.
+- Composable APIs instead of locked-in page templates.
+- Accessible, predictable markup.
+- Styling that works well with Tailwind CSS.
+- Small, focused components that can be adopted one at a time.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm add react-ui-kit
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+React is a peer dependency, so your app should already provide `react` and `react-dom`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Usage
 
-export default defineConfig([
-  globalIgnores(['dist']),
+```tsx
+import { DataGrid, type Column } from "react-ui-kit";
+
+type User = {
+  id: number;
+  name: string;
+  role: string;
+  status: "Active" | "Invited";
+};
+
+const columns: Column<User>[] = [
+  { key: "name", header: "Name" },
+  { key: "role", header: "Role" },
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
+    key: "status",
+    header: "Status",
+    render: (user) => <strong>{user.status}</strong>,
   },
-])
+];
+
+const users: User[] = [
+  { id: 1, name: "Ada Lovelace", role: "Engineer", status: "Active" },
+  { id: 2, name: "Grace Hopper", role: "Admin", status: "Invited" },
+];
+
+export function UsersTable() {
+  return (
+    <DataGrid
+      columns={columns}
+      data={users}
+      emptyMessage="No users found."
+    />
+  );
+}
 ```
+
+## DataGrid API
+
+### `DataGrid<T>`
+
+| Prop | Type | Required | Description |
+| --- | --- | --- | --- |
+| `columns` | `Column<T>[]` | Yes | Column definitions for the table. |
+| `data` | `T[]` | Yes | Rows rendered by the grid. |
+| `loading` | `boolean` | No | Displays a loading state when true. |
+| `emptyMessage` | `string` | No | Message shown when `data` is empty. |
+
+### `Column<T>`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `keyof T \| string` | Yes | Field used to read the row value and key the cell. |
+| `header` | `string` | Yes | Text rendered in the column header. |
+| `render` | `(row: T) => ReactNode` | No | Custom cell renderer for derived or formatted values. |
+
+## Local Development
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Run the playground app:
+
+```bash
+pnpm dev
+```
+
+Type-check the app:
+
+```bash
+pnpm typecheck
+```
+
+Run lint:
+
+```bash
+pnpm lint
+```
+
+Build the package:
+
+```bash
+pnpm build
+```
+
+## Project Structure
+
+```text
+src/
+  components/
+    data-grid/
+      DataGrid.tsx
+      index.tsx
+  index.ts
+```
+
+- `src/index.ts` is the library entrypoint.
+- `src/components/**` contains reusable package components.
+- `src/App.tsx` is only the local playground/demo surface.
+
+## Roadmap
+
+- DataGrid sorting, selection, pagination, and column alignment.
+- Form controls for enterprise workflows.
+- Navigation, tabs, modals, and command surfaces.
+- Dashboard and data-display components.
+- Stronger accessibility coverage and interaction tests.
+
+## Contributing
+
+Contributions are welcome. Before opening a pull request, run:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+```
+
+For larger changes, open an issue first so the API direction can be discussed.
+
+## License
+
+MIT
